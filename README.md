@@ -1,4 +1,4 @@
-### t-sql script sack
+# t-sql script sack
 
 ## Description
 A collection of useful transact sql scripts. Probably most useful for database administrators.
