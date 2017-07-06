@@ -1,5 +1,5 @@
 SELECT 
-  migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) AS improvement_measure, 
+  dbs.name AS [database_name], migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) AS improvement_measure, 
   'CREATE INDEX [missing_index_' + CONVERT (varchar, mig.index_group_handle) + '_' + CONVERT (varchar, mid.index_handle) 
   + '_' + LEFT (PARSENAME(mid.statement, 1), 32) + ']'
   + ' ON ' + mid.statement 
@@ -12,5 +12,6 @@ SELECT
 FROM sys.dm_db_missing_index_groups mig
 INNER JOIN sys.dm_db_missing_index_group_stats migs ON migs.group_handle = mig.index_group_handle
 INNER JOIN sys.dm_db_missing_index_details mid ON mig.index_handle = mid.index_handle
+JOIN sys.databases dbs on mid.database_id = dbs.database_id
 WHERE migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) > 10
-ORDER BY migs.avg_total_user_cost * migs.avg_user_impact * (migs.user_seeks + migs.user_scans) DESC
+ORDER BY dbs.name, migs.avg_total_user_cost * migs.avg_user_impact * (migs.user_seeks + migs.user_scans) DESC
